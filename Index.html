@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Pengisian Jadwal Pertandingan Sepak Bola</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://i.ibb.co/Cp5CtTL6/kilua.gif');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        h2 {
+            text-align: center;
+            color: #00bfff;
+            margin-top: 50px;
+        }
+        
+        .form-container {
+            margin: 0 auto;
+            text-align: center;
+            width: 60%;
+            padding: 20px;
+            background-color: rgba(28, 28, 28, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        
+        .form-container textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #00bfff;
+            border-radius: 5px;
+            font-size: 16px;
+            min-height: 150px;
+            background-color: #333;
+            color: white;
+        }
+        
+        .form-container button {
+            padding: 10px 20px;
+            background-color: #00bfff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .form-container button:hover {
+            background-color: #008fb3;
+        }
+
+        .output {
+            margin-top: 30px;
+            text-align: center;
+            color: #00bfff;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .liga {
+            font-weight: bold;
+            font-size: 26px;
+            text-transform: uppercase;
+            margin-top: 20px;
+            padding: 10px 0;
+            border-bottom: 2px solid #00bfff;
+        }
+
+        .pertandingan {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 18px;
+            color: #fff;
+            margin-top: 10px;
+        }
+
+        .pertandingan div {
+            background: #222;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            width: 50%;
+            text-align: center;
+        }
+
+        .copy-btn {
+            padding: 10px 20px;
+            background-color: #00bfff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: #008fb3;
+        }
+
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            background-color: white;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: fall 5s infinite linear;
+            opacity: 0.8;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="snowflake-container"></div>
+    <h2>Pengisian Jadwal Pertandingan Sepak Bola</h2>
+    <div class="form-container">
+        <label for="jadwalInput">Masukkan Jadwal Pertandingan:</label>
+        <textarea id="jadwalInput" placeholder="Masukkan jadwal pertandingan (pisahkan liga dan pertandingan dengan baris kosong)"></textarea>
+        <button onclick="prosesInput()">Proses Jadwal</button>
+    </div>
+    <button class="copy-btn" onclick="copyToClipboard()">Salin Hasil</button>
+    <div id="output" class="output"></div>
+    <script>
+        function prosesInput() {
+            var input = document.getElementById('jadwalInput').value.trim();
+            if (input === "") {
+                alert("Harap lengkapi kolom input!");
+                return;
+            }
+            var ligaArray = input.split(/\n{2,}/);
+            var outputHTML = '';
+            ligaArray.forEach(function(ligaText) {
+                var lines = ligaText.trim().split('\n');
+                var namaLiga = lines[0].trim();
+                var jadwal = lines.slice(1);
+                outputHTML += `<div class="liga">${namaLiga}</div><div class="pertandingan">`;
+                jadwal.forEach(match => {
+                    match = match.replace(/\bvs\b/g, 'VS');
+                    match = match.replace(/(\d+)\s*-\s*(\d+)/g, '$1 : $2');
+                    outputHTML += `<div>${match}</div>`;
+                });
+                outputHTML += `</div><br>`;
+            });
+            document.getElementById('output').innerHTML = outputHTML;
+            document.getElementById('jadwalInput').value = '';
+        }
+
+        function copyToClipboard() {
+            var result = document.getElementById('output').innerText;
+            if (result) {
+                var textarea = document.createElement('textarea');
+                textarea.value = result;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert("Hasil berhasil disalin!");
+            } else {
+                alert("Tidak ada hasil untuk disalin.");
+            }
+        }
+
+        function createSnowflakes() {
+            var container = document.getElementById('snowflake-container');
+            for (var i = 0; i < 50; i++) {
+                var snowflake = document.createElement('div');
+                snowflake.classList.add('snowflake');
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = (Math.random() * 3 + 5) + 's';
+                snowflake.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(snowflake);
+            }
+        }
+
+        createSnowflakes();
+    </script>
+</body>
+</html>
